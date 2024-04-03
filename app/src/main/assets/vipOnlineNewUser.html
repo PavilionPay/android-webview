@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+    <head>
+        <meta charset="utf-8" />
+        <title>VIP Online New User Deposit</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+        <style>
+            .loader {
+                border: 6px solid #f3f3f3; /* Light grey */
+                border-top: 6px solid #3498db; /* Blue */
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                animation: spin 2s linear infinite;
+            }
+            
+            .hide {
+                display: none
+            }
+            
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            
+            label {
+                font-weight: 600;
+                font-size: 80%;
+                text-transform: uppercase;
+                color: gray;
+            }
+            
+            button {
+                background-color: #0075E3;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <h3>VIP Online New User</h3>
+        <form>
+            <div>
+                <b>Version 11</b>
+                <label for="sdkBaseUrl">SDK Base URL</label>
+                <input type="text" id="sdkBaseUrl" name="sdkBaseUrl" value="https://qa.api-gaming.paviliononline.io/sdk?mode=deposit" />
+                
+                <label for="apiBaseUrl">API Base URL</label>
+                <input type="text" id="apiBaseUrl" name="apiBaseUrl" value="https://qa.api-gaming.paviliononline.io/gaming/mobility/sdk/api/patronsession/new" />
+            </div>
+            <br />
+            <div>
+                <label for="idNumber">SSN</label>
+                <input type="text" id="idNumber" name="idNumber" readonly />
+                <script>document.getElementById("idNumber").value = (Math.floor(Math.random() * 999999999) + 1).toString();</script>
+            </div>
+            <br />
+            <button type="button" onclick="CreateSessionAndLaunchSDK()">Create Session & Launch SDK</button>
+            <br />
+        </form>
+        
+        <div id="loadingDiv" class="hide">
+            <p id="message">Creating session...</p>
+            <div class="loader"></div>
+        </div>
+        
+        <script>
+            function CreateSessionAndLaunchSDK() {
+                var transactionId = "BP12sd" + (100000000 + Math.floor(Math.random() * 899999999))
+                var sdkBaseUrl = document.getElementById("sdkBaseUrl").value;
+                var apiBaseUrl = document.getElementById("apiBaseUrl").value;
+                var social = document.getElementById("idNumber").value;
+                
+                const token = "";
+                
+                const requestOptions = {
+                    method: "POST",
+                    headers: {
+                        "Access-Control-Allow-Origin":  "*",
+                        "Accept":                       "application/json",
+                        "Content-Type":                 "application/json",
+                        "Authorization":                "Bearer " + token,
+                    },
+                    body: JSON.stringify({
+                        "PatronId": "1224e6b0-7560-4350-9106-d69403c4f116",
+                        "FirstName": "Jane",
+                        "MiddleInitial": "",
+                        "LastName": "Public",
+                        "DateOfBirth": "11/14/1990",
+                        "Email": "Rr9FUwJ@ACEbJ9.com",
+                        "MobilePhone": "3023492104",
+                        "StreetName": "1301 E Main ST",
+                        "City": "Carbondale",
+                        "State": "IL",
+                        "Zip": "62901",
+                        "Country": "USA",
+                        "IdType": "SS",
+                        "IdNumber": social,
+                        "IdState": "IL",
+                        "transactionId": transactionId,
+                        "transactionAmount": 10.8,
+                        "RoutingNumber": "061000052",
+                        "AccountNumber": "",
+                        "walletBalance": "1000",
+                        "RemainingDailyDeposit": "999.99",
+                        "productType" : 0,
+                        "threatMetrixForceFail" : false
+                    }),
+                };
+                
+                document.getElementById("loadingDiv").classList.remove("hide");
+                
+                if (token == "") {
+                    document.getElementById("message").innerText = "Missing Bearer Token"
+                    return
+                }
+                
+                window
+                .fetch("https://corsproxy.io/?" + encodeURIComponent(apiBaseUrl), requestOptions)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Error");
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log(JSON.stringify(data, null, 2));
+                    window.location.href = sdkBaseUrl + "#" + data.sessionId;
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    document.getElementById("message").innerText = error;
+                });
+            }
+            
+        </script>
+    </body>
+    
+</html>
